@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emergency Contact - {{ profile.full_name }}</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .emergency-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-left: 5px solid #ff4444;
+        }
+        .header {
+            text-align: center;
+            color: #ff4444;
+            margin-bottom: 20px;
+        }
+        .info-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .label {
+            font-weight: bold;
+            width: 150px;
+            color: #555;
+        }
+        .value {
+            flex: 1;
+            color: #333;
+        }
+        .emergency-badge {
+            background: #ff4444;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .note {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #ffc107;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #888;
+            font-size: 12px;
+        }
+        .blood-group {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+        .location-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            border: 2px dashed #2196f3;
+        }
+        .btn-location {
+            background: #2196f3;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-location:hover {
+            background: #1976d2;
+        }
+        .btn-location:disabled {
+            background: #90caf9;
+            cursor: not-allowed;
+        }
+        #status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .status-loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .small-text {
+            font-size: 13px;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="emergency-card">
+        <div class="header">
+            <h1>🚨 Emergency Contact</h1>
+            <span class="emergency-badge">⚠️ Important Medical Information</span>
+        </div>
+
+        <div class="info-row">
+            <div class="label">Full Name</div>
+            <div class="value"><strong>{{ profile.full_name }}</strong></div>
+        </div>
+
+        <div class="info-row">
+            <div class="label">Phone Number</div>
+            <div class="value">{{ profile.phone_number|default:"Not specified" }}</div>
+        </div>
+
+        <div class="info-row">
+            <div class="label">Blood Group</div>
+            <div class="value">
+                {% if profile.blood_group %}
+                    <span class="blood-group">{{ profile.blood_group }}</span>
+                {% else %}
+                    Not specified
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div class="label">Emergency Contact 1</div>
+            <div class="value">{{ profile.emergency_contact_1|default:"Not specified" }}</div>
+        </div>
+
+        <div class="info-row">
+            <div class="label">Emergency Contact 2</div>
+            <div class="value">{{ profile.emergency_contact_2|default:"Not specified" }}</div>
+        </div>
+
+        {% if profile.medical_notes %}
+        <div class="note">
+            <strong>📋 Medical Notes:</strong><br>
+            {{ profile.medical_notes }}
+        </div>
+        {% endif %}
+
+        <div class="location-box">
+            <p style="font-size: 16px; font-weight: bold; color: #1976d2;">📍 Share Your Location</p>
+            <p style="font-size: 14px; color: #555;">Click the button below to send your location to emergency contacts.</p>
+            
+            <button id="share-location-btn" class="btn-location" onclick="getLocation()">
+                📍 Share My Location
+            </button>
+            
+            <div id="status-message"></div>
+            <div class="small-text">⚠️ You must allow location access when prompted by your browser.</div>
+        </div>
+
+        <div class="footer">
+            <p>This information is for emergency purposes only.</p>
+            <p>Last updated: {{ profile.updated_at|date:"F j, Y" }}</p>
+        </div>
+    </div>
+
+    <script>
+        const profileUUID = "{{ profile.uuid }}";
+        const statusDiv = document.getElementById('status-message');
+        const shareBtn = document.getElementById('share-location-btn');
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function getLocation() {
+            console.log('📍 Getting location...');
+            shareBtn.disabled = true;
+            shareBtn.textContent = '⏳ Getting location...';
+            
+            if (!navigator.geolocation) {
+                showStatus('⚠️ Geolocation is not supported by your browser.', 'status-error');
+                shareBtn.disabled = false;
+                shareBtn.textContent = '📍 Share My Location';
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    console.log('📍 Location obtained:', lat, lng);
+                    showStatus('📍 Sending location to emergency contacts...', 'status-loading');
+                    sendLocation(lat, lng);
+                },
+                function(error) {
+                    console.error('Location error:', error);
+                    let errorMsg = '';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMsg = '⚠️ Location access denied. Please allow location in your browser settings.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMsg = '⚠️ Location unavailable. Please check your GPS/WiFi connection.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMsg = '⚠️ Location request timed out. Please try again.';
+                            break;
+                        default:
+                            errorMsg = '⚠️ Unable to get location. Please try again.';
+                            break;
+                    }
+                    showStatus(errorMsg, 'status-error');
+                    shareBtn.disabled = false;
+                    shareBtn.textContent = '📍 Share My Location';
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        function sendLocation(lat, lng) {
+            const csrftoken = getCookie('csrftoken');
+            console.log('CSRF Token:', csrftoken);
+            
+            const url = `/accounts/log-scan/${profileUUID}/`;
+            console.log('Sending to:', url);
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    latitude: lat,
+                    longitude: lng
+                })
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP ${response.status}: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    showStatus('✅ Emergency contacts have been notified with your location!', 'status-success');
+                    shareBtn.textContent = '✅ Location Shared';
+                    shareBtn.disabled = true;
+                } else {
+                    showStatus('⚠️ ' + (data.error || 'Something went wrong'), 'status-error');
+                    shareBtn.disabled = false;
+                    shareBtn.textContent = '📍 Share My Location';
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                showStatus('⚠️ Error sending location: ' + error.message, 'status-error');
+                shareBtn.disabled = false;
+                shareBtn.textContent = '📍 Share My Location';
+            });
+        }
+
+        function showStatus(message, className) {
+            statusDiv.textContent = message;
+            statusDiv.className = className;
+            statusDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
