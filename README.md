@@ -1,34 +1,52 @@
 # Emergency Access Profile
 
-A web-based emergency identification and contact system that helps connect accident victims, children, elderly individuals, or vulnerable persons with their emergency contacts through QR code scanning.
+A privacy-focused, open-source emergency access platform designed for children, elderly individuals, and accident victims.
 
-## Problem
+The goal is simple:
 
-In many emergencies, bystanders are willing to help but often have no way to quickly identify a person or contact their family members.
-
-Examples:
-
-* Road accidents
-* Missing children
-* Elderly individuals with memory-related conditions
-* Medical emergencies
-* Individuals unable to communicate
-
-Emergency Access Profile provides a simple solution: scan a QR code and instantly access essential emergency information and contact details.
+**Provide critical emergency information when it is needed, while minimizing unnecessary exposure of personal data.**
 
 ---
 
-## Features
+# Why This Project Exists
+
+In an emergency, bystanders are often willing to help but have no way to identify a person or contact their family.
+
+Existing solutions frequently require users to share large amounts of personal information, maintain persistent records, or rely on centralized systems that retain sensitive data indefinitely.
+
+Emergency Access Profile is being built around a different principle:
+
+> Store only what is necessary. Share only what is necessary. Retain information only as long as it serves a legitimate emergency purpose.
+
+---
+
+# Target Users
+
+## Children
+
+If a child becomes separated from their guardian, a responsible adult can scan the QR code and initiate contact with family members.
+
+## Elderly Individuals
+
+Provides emergency identification and family notification for seniors who may require assistance or have memory-related conditions.
+
+## Accident Victims
+
+Allows first responders or bystanders to access critical emergency information and notify designated contacts.
+
+---
+
+# Current Features
 
 ### User Authentication
 
 * User registration
-* Secure login/logout
+* Secure login and logout
 * Session management
 
-### Emergency Profile Management
+### Emergency Profiles
 
-Each user can maintain:
+Users can maintain:
 
 * Full Name
 * Phone Number
@@ -41,79 +59,99 @@ Each user can maintain:
 
 * Unique QR code for every profile
 * Downloadable QR image
-* UUID-based public profile access
-* Regeneratable QR codes
+* UUID-based public access links
 
-### Public Emergency Page
-
-Accessible without login.
-
-Displays:
-
-* Name
-* Blood Group
-* Emergency Contacts
-* Medical Notes
-
-Designed for quick access during emergencies.
-
-### Location Sharing
+### Public Emergency Access
 
 When a QR code is scanned:
 
-* Browser requests location permission
-* Latitude and longitude are captured
-* Scan event is recorded
-* Location can be shared with emergency contacts
+* Emergency profile becomes accessible
+* Critical information can be viewed immediately
+* Location sharing can be initiated
 
-### Emergency Alerts
+### Location Sharing
+
+The scanner can voluntarily share their location.
+
+The system captures:
+
+* Latitude
+* Longitude
+* Timestamp
+
+and can notify designated emergency contacts.
+
+### Emergency Notifications
 
 Automatic email notifications include:
 
 * User information
-* Scan timestamp
-* GPS coordinates
-* Google Maps location link
+* Emergency event timestamp
+* Shared location
+* Google Maps link
 * Medical notes
 
 ### Scan Logging
 
-Tracks:
+For auditing and emergency tracking:
 
-* Scan timestamp
-* IP address
-* Browser information
-* GPS coordinates (when permitted)
+* Scan timestamps
+* Location data
+* Device information
+* IP information
 
----
-
-## System Workflow
-
-1. User creates an account.
-2. User completes emergency profile.
-3. User generates a QR code.
-4. User saves or prints the QR code.
-5. QR code is scanned during an emergency.
-6. Emergency profile becomes accessible.
-7. Scanner optionally shares location.
-8. Emergency contacts receive an alert.
-9. Scan information is recorded.
+can be recorded during emergency events.
 
 ---
 
-## Technology Stack
+# Privacy-First Direction
+
+Emergency Access Profile is being developed with data minimization as a core design goal.
+
+Future versions will focus on reducing unnecessary exposure of personal information while maintaining usability during emergencies.
+
+Planned improvements include:
+
+* OTP-based guardian verification
+* Limited public profile visibility
+* Temporary emergency event records
+* Automatic data expiration policies
+* Enhanced privacy controls
+* Secure access workflows
+
+The objective is to ensure that strangers can assist during emergencies without gaining unrestricted access to sensitive personal information.
+
+---
+
+# Example Emergency Workflow
+
+1. User creates an emergency profile.
+2. User generates a QR code.
+3. QR code is attached to belongings, ID cards, or wearable items.
+4. A bystander scans the QR code during an emergency.
+5. Essential information becomes visible.
+6. Scanner may share their location.
+7. Emergency contacts receive notifications.
+8. Emergency event is logged.
+9. Future versions will automatically remove temporary emergency records after a defined retention period.
+
+---
+
+# Technology Stack
 
 ### Backend
 
+* Python
 * Django
 
 ### Database
 
-* Supabase PostgreSQL
+* PostgreSQL
+* Supabase
 
 ### Authentication
 
-* Django Authentication System
+* Django Authentication Framework
 
 ### QR Generation
 
@@ -122,141 +160,105 @@ Tracks:
 
 ### Notifications
 
-* Gmail SMTP
+* SMTP Email Services
 
-### Environment Management
+### Frontend
 
-* python-dotenv
-
----
-
-## Project Structure
-
-```text
-Emergency-Access-Profile/
-├── accounts/
-├── core/
-├── templates/
-├── media/
-├── manage.py
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
+* Django Templates
 
 ---
 
-## Installation
+# Open Source Mission
 
-### Clone Repository
+Emergency Access Profile is being developed as an open-source project.
 
-```bash
-git clone https://github.com/arunsamy4444/Emergency-Access-Profile.git
-cd Emergency-Access-Profile
-```
+The mission is to create emergency communication tools that remain:
 
-### Create Virtual Environment
+* Accessible
+* Transparent
+* Community-driven
+* Privacy-conscious
 
-```bash
-python -m venv venv
-```
-
-Activate:
-
-Windows:
-
-```bash
-venv\Scripts\activate
-```
-
-Linux/macOS:
-
-```bash
-source venv/bin/activate
-```
-
-### Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### Configure Environment Variables
-
-Create a `.env` file:
-
-```env
-SECRET_KEY=your_secret_key
-
-SUPABASE_DB_NAME=
-SUPABASE_DB_USER=
-SUPABASE_DB_PASSWORD=
-SUPABASE_DB_HOST=
-SUPABASE_DB_PORT=
-
-EMAIL_HOST_USER=
-EMAIL_HOST_PASSWORD=
-```
-
-### Apply Migrations
-
-```bash
-python manage.py migrate
-```
-
-### Run Development Server
-
-```bash
-python manage.py runserver
-```
+without relying on invasive tracking, behavioral profiling, or unnecessary data collection.
 
 ---
 
-## Future Improvements
+# Project Status
 
-* SMS notifications
-* WhatsApp alerts
-* Scan history dashboard
-* Multi-language support
-* Mobile application
-* QR sticker printing support
-* Emergency contact verification
-* Role-based access control
-* Encryption of sensitive medical information
-* Hospital and public-service integration
+Current Stage: Prototype
+
+Implemented:
+
+* Authentication System
+* Emergency Profiles
+* QR Code Generation
+* Public Emergency Pages
+* Location Sharing
+* Email Notifications
+* Scan Logging
+
+In Development:
+
+* Guardian Verification
+* Privacy Controls
+* Data Expiration Policies
+* Reminder System
+* Security Hardening
+
+---
+## Prototype Disclaimer
+
+This project is currently an early-stage prototype built to validate the core emergency access workflow.
+
+The current implementation demonstrates:
+
+* User authentication
+* Emergency profile management
+* QR code generation
+* Public emergency access pages
+* Location sharing
+* Email notifications
+* Event logging
+
+However, the system is **not yet production-ready** and should not currently be relied upon as a mission-critical emergency service.
+
+Current limitations include:
+
+* Not designed for large-scale deployment
+* Limited security hardening
+* No independent security audit
+* Basic access-control model
+* Limited abuse-prevention mechanisms
+* No high-availability infrastructure
+* No disaster recovery guarantees
+* No formal compliance review
+
+Several important security and privacy features are still under development, including:
+
+* OTP-based guardian verification
+* Fine-grained data access controls
+* Automatic data expiration policies
+* Enhanced encryption strategies
+* Advanced audit and monitoring systems
+* Privacy-focused access workflows
+
+The purpose of the current prototype is to validate the concept, gather feedback, and guide future development toward a secure, privacy-conscious, and scalable platform.
 
 ---
 
-## Use Cases
+# Long-Term Vision
 
-### Accident Victims
+Build a practical emergency assistance platform that balances two goals:
 
-Emergency contacts can be notified immediately after QR scanning.
+1. Fast access to critical emergency information.
+2. Strong protection of personal data.
 
-### Children
-
-Parents can be contacted if a child is lost.
-
-### Elderly Individuals
-
-Provides identification and emergency contact information.
-
-### Medical Emergencies
-
-Important medical notes become accessible to first responders and bystanders.
+The project aims to demonstrate that emergency response tools can remain useful without requiring permanent surveillance or excessive data retention.
 
 ---
 
-## Status
-
-Current Status: Prototype
-
-The project currently demonstrates the complete emergency-access workflow from profile creation to QR scanning and emergency contact notification.
-
----
-
-## Author
+# Author
 
 Arun Samy
 
-GitHub: https://github.com/arunsamy4444
+Open Source Project
